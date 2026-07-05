@@ -364,6 +364,7 @@ td input:focus,td select:focus{outline:1px solid #1a5276;border-radius:2px;backg
 // ============================================================
 const COMPANY = {
   name: 'บริษัท ฝูจี๋ 689 จำกัด',
+  nameEn: 'FUJI689 CO., LTD.',
   addr: 'สำนักงานใหญ่ : 5/54 หมู่ที่ 6 แขวงหลักสอง เขตหลักสี่ กรุงเทพมหานคร 10210',
   tax: '0105565012308'
 };
@@ -732,6 +733,7 @@ function printReceipts(){
     <div class="doc-page">
       <div class="doc-title">ใบเสร็จรับเงิน</div>
       <div class="doc-company">${COMPANY.name}</div>
+      <div class="doc-company" style="font-size:10pt">${COMPANY.nameEn}</div>
       <div class="doc-company" style="font-size:10pt">${COMPANY.addr}</div>
       <div class="doc-company" style="font-size:10pt">เลขประจำตัวผู้เสียภาษีอากร ${COMPANY.tax}</div>
       <hr style="margin:8px 0">
@@ -839,7 +841,7 @@ function printCertificate(){
       ขอรับรองว่า รายจ่ายข้างต้นนี้ไม่อาจเรียกเก็บใบเสร็จรับเงินจากผู้รับได้ และข้าพเจ้าได้จ่ายไปในงานของทาง
     </div>
     <div style="margin-top:4px;font-size:11pt">
-      ${COMPANY.name} โดยแท้ ตั้งแต่วันที่ <u>${fromDate}</u> ถึงวันที่ <u>${toDate}</u>
+      ${COMPANY.name} (${COMPANY.nameEn}) โดยแท้ ตั้งแต่วันที่ <u>${fromDate}</u> ถึงวันที่ <u>${toDate}</u>
     </div>
     <div class="doc-sig-row" style="margin-top:30px">
       <div style="flex:2"></div>
@@ -890,7 +892,8 @@ function printReport(){
   const html = `
   <div class="doc-page">
     <div class="doc-title">รายรับ - รายจ่ายสำหรับเดือน ${month}</div>
-    <div style="text-align:center;margin-bottom:8px;font-size:11pt">${COMPANY.name}</div>
+    <div style="text-align:center;margin-bottom:2px;font-size:11pt">${COMPANY.name}</div>
+    <div style="text-align:center;margin-bottom:6px;font-size:10pt">${COMPANY.nameEn}</div>
     <table class="doc-table">
       <thead>
         <tr>
