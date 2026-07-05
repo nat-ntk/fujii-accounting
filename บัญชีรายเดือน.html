@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ระบบบัญชีรายเดือน - บจ. ฝูจี๋ 689</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Leelawadee UI','Leelawadee',Tahoma,sans-serif;background:#f0f2f5;color:#333;font-size:14px}
+h1{font-size:20px;font-weight:700}
+h2{font-size:16px;font-weight:700;margin-bottom:12px}
+
+/* Layout */
+.header{background:#1a5276;color:#fff;padding:14px 24px;display:flex;align-items:center;gap:16px}
+.header h1{color:#fff}
+.month-select{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:13px}
+.month-select select,.month-select input{padding:4px 8px;border-radius:4px;border:none;font-size:13px;font-family:inherit}
+
+.tabs{display:flex;background:#fff;border-bottom:2px solid #ddd;padding:0 24px}
+.tab{padding:10px 20px;cursor:pointer;border-bottom:3px solid transparent;font-size:14px;font-weight:600;color:#666}
+.tab.active{color:#1a5276;border-bottom-color:#1a5276}
+
+.content{padding:20px 24px;max-width:1100px;margin:0 auto}
+
+/* Cards */
+.card{background:#fff;border-radius:8px;padding:20px;margin-bottom:16px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+
+/* Buttons */
+.btn{padding:8px 16px;border-radius:5px;border:none;cursor:pointer;font-size:13px;font-family:inherit;font-weight:600}
+.btn-primary{background:#1a5276;color:#fff}
+.btn-primary:hover{background:#154360}
+.btn-success{background:#1e8449;color:#fff}
+.btn-danger{background:#c0392b;color:#fff;padding:4px 10px;font-size:12px}
+.btn-outline{background:#fff;border:1px solid #ccc;color:#333}
+.btn-sm{padding:4px 10px;font-size:12px}
+.btn-orange{background:#e67e22;color:#fff}
+
+/* Tables */
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:#eaf0fb;padding:8px 10px;text-align:left;font-weight:700;border:1px solid #ddd}
+td{padding:7px 10px;border:1px solid #ddd;vertical-align:top}
+tr:hover td{background:#fafafa}
+td input,td select{width:100%;border:none;background:transparent;font-family:inherit;font-size:13px;padding:2px}
+td input:focus,td select:focus{outline:1px solid #1a5276;border-radius:2px;background:#fff}
+.num{text-align:right}
+
+/* Upload area */
+.upload-area{border:2px dashed #aaa;border-radius:8px;padding:30px;text-align:center;color:#888;cursor:pointer;transition:.2s}
+.upload-area:hover{border-color:#1a5276;color:#1a5276;background:#f0f6ff}
+
+/* Slip gallery */
+.slip-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-top:12px}
+.slip-item{position:relative;border:1px solid #ddd;border-radius:6px;overflow:hidden;background:#fff}
+.slip-item img{width:100%;height:180px;object-fit:contain;background:#f9f9f9;display:block}
+.slip-item .slip-label{padding:6px 8px;font-size:11px;border-top:1px solid #eee}
+.slip-item .slip-label select{width:100%;font-size:11px;border:none;background:transparent}
+.slip-remove{position:absolute;top:4px;right:4px;background:rgba(192,57,43,.8);color:#fff;border:none;border-radius:50%;width:20px;height:20px;cursor:pointer;font-size:12px;line-height:1}
+
+/* Summary box */
+.summary-box{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+.summary-card{background:#fff;border-radius:8px;padding:16px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.summary-card .label{font-size:12px;color:#888;margin-bottom:4px}
+.summary-card .amount{font-size:22px;font-weight:700}
+.income-color{color:#1e8449}
+.expense-color{color:#c0392b}
+.profit-color{color:#1a5276}
+
+/* Print buttons */
+.print-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.print-card{background:#fff;border-radius:8px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,.08);text-align:center}
+.print-card .icon{font-size:36px;margin-bottom:8px}
+.print-card h3{font-size:15px;margin-bottom:6px}
+.print-card p{font-size:12px;color:#888;margin-bottom:14px}
+
+/* Notice */
+.notice{background:#fffde7;border-left:4px solid #f9a825;padding:10px 14px;border-radius:4px;font-size:13px;margin-bottom:12px}
+
+/* ============ PRINT STYLES ============ */
+@media print {
+  body *{visibility:hidden}
+  .print-area,
+  .print-area *{visibility:visible}
+  .print-area{
+    position:fixed;top:0;left:0;width:100%;
+    font-family:'Leelawadee UI','Leelawadee',Tahoma,sans-serif;
+    font-size:13pt;color:#000
+  }
+}
+
+/* Document templates (hidden, shown on print) */
+.print-area{display:none}
+.doc-page{
+  width:21cm;min-height:29.7cm;padding:1.5cm 2cm;
+  background:#fff;margin:0 auto;page-break-after:always;
+  font-family:'Leelawadee UI','Leelawadee',Tahoma,sans-serif;
+  font-size:12pt;
+}
+.doc-title{text-align:center;font-size:18pt;font-weight:700;margin-bottom:10px}
+.doc-company{font-size:11pt;margin-bottom:2px}
+.doc-table{width:100%;border-collapse:collapse;margin:10px 0;font-size:11pt}
+.doc-table th,.doc-table td{border:1px solid #000;padding:5px 8px}
+.doc-table th{background:#f0c090;font-weight:700;text-align:center}
+.doc-header-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.doc-field{margin-bottom:5px;font-size:11pt}
+.doc-field span{display:inline-block;min-width:120px}
+.doc-sig-row{display:flex;justify-content:space-between;margin-top:30px}
+.doc-sig{text-align:center;flex:1}
+.doc-sig-line{border-top:1px solid #000;width:160px;margin:0 auto 5px}
+.doc-total-row td{font-weight:700;background:#f5f5f5}
+</style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<div class="header">
+  <h1>📊 ระบบบัญชีรายเดือน</h1>
+  <div style="font-size:12px;opacity:.8">บริษัท ฝูจี๋ 689 จำกัด</div>
+  <div class="month-select">
+    <span>เดือน:</span>
+    <select id="selMonth">
+      <option value="1">มกราคม</option><option value="2">กุมภาพันธ์</option>
+      <option value="3">มีนาคม</option><option value="4">เมษายน</option>
+      <option value="5">พฤษภาคม</option><option value="6">มิถุนายน</option>
+      <option value="7">กรกฎาคม</option><option value="8">สิงหาคม</option>
+      <option value="9">กันยายน</option><option value="10">ตุลาคม</option>
+      <option value="11">พฤศจิกายน</option><option value="12">ธันวาคม</option>
+    </select>
+    <input type="number" id="selYear" value="2568" style="width:70px">
+    <button class="btn btn-outline btn-sm" onclick="clearMonth()">ล้างข้อมูล</button>
+  </div>
+</div>
+
+<!-- ===== TABS ===== -->
+<div class="tabs">
+  <div class="tab active" onclick="showTab('import')">📥 นำเข้า Statement</div>
+  <div class="tab" onclick="showTab('income')">💰 รายรับ</div>
+  <div class="tab" onclick="showTab('expense')">💸 รายจ่าย</div>
+  <div class="tab" onclick="showTab('slips')">🖼 สลิป</div>
+  <div class="tab" onclick="showTab('print')">🖨 ออกเอกสาร</div>
+</div>
+
+<!-- ===== CONTENT ===== -->
+<div class="content">
+
+<!-- TAB: IMPORT -->
+<div id="tab-import">
+  <div class="card">
+    <h2>อัพโหลด Statement กสิกรไทย (PDF)</h2>
+    <div class="notice">รองรับ PDF Statement จากธนาคารกสิกรไทย — ระบบจะดึงรายการโอนเข้าให้อัตโนมัติ</div>
+    <div class="upload-area" onclick="document.getElementById('pdfInput').click()" id="uploadArea">
+      <div style="font-size:40px;margin-bottom:8px">📄</div>
+      <div>คลิกเพื่อเลือกไฟล์ PDF Statement</div>
+      <div style="font-size:12px;margin-top:4px">หรือลาก drop ไฟล์มาวางที่นี่</div>
+    </div>
+    <input type="file" id="pdfInput" accept=".pdf" style="display:none" onchange="parsePDF(this.files[0])">
+    <div id="parseStatus" style="margin-top:12px;font-size:13px;color:#555"></div>
+  </div>
+
+  <div class="card" id="extractedCard" style="display:none">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <h2>รายการที่ดึงได้ <span id="extractCount" style="color:#1e8449"></span></h2>
+      <button class="btn btn-primary" onclick="importAll()">นำเข้าทั้งหมด →</button>
+    </div>
+    <table>
+      <thead><tr>
+        <th>วันที่</th><th>ชื่อผู้โอน</th><th>รายละเอียด</th>
+        <th class="num">ยอดโอนเข้า</th><th>นำเข้า</th>
+      </tr></thead>
+      <tbody id="extractedBody"></tbody>
+    </table>
+  </div>
+
+  <!-- Manual add if PDF doesn't parse -->
+  <div class="card">
+    <h2>เพิ่มรายรับด้วยตนเอง</h2>
+    <div style="display:grid;grid-template-columns:140px 1fr 120px auto;gap:8px;align-items:end">
+      <div><label style="font-size:12px;color:#666">วันที่</label><br>
+        <input type="date" id="mDate" class="input-field" style="padding:6px;border:1px solid #ccc;border-radius:4px;width:100%;font-family:inherit;font-size:13px">
+      </div>
+      <div><label style="font-size:12px;color:#666">ชื่อลูกค้า</label><br>
+        <input type="text" id="mName" placeholder="ชื่อผู้โอน/ลูกค้า" style="padding:6px;border:1px solid #ccc;border-radius:4px;width:100%;font-family:inherit;font-size:13px">
+      </div>
+      <div><label style="font-size:12px;color:#666">ยอด (บาท)</label><br>
+        <input type="number" id="mAmount" placeholder="0.00" style="padding:6px;border:1px solid #ccc;border-radius:4px;width:100%;font-family:inherit;font-size:13px">
+      </div>
+      <button class="btn btn-success" onclick="addManualIncome()">+ เพิ่ม</button>
+    </div>
+  </div>
+</div>
+
+<!-- TAB: INCOME -->
+<div id="tab-income" style="display:none">
+  <div class="summary-box">
+    <div class="summary-card">
+      <div class="label">รายรับรวม</div>
+      <div class="amount income-color" id="sumIncome">฿0</div>
+    </div>
+    <div class="summary-card">
+      <div class="label">จำนวนรายการ</div>
+      <div class="amount" id="sumCount">0</div>
+    </div>
+    <div class="summary-card">
+      <div class="label">เลขที่ใบเสร็จถัดไป</div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:4px">
+        <span style="font-size:14px">เล่ม</span>
+        <input type="number" id="bookNo" value="2" style="width:50px;padding:4px;border:1px solid #ccc;border-radius:4px;text-align:center;font-size:14px">
+        <span style="font-size:14px">เลขที่</span>
+        <input type="number" id="receiptNo" value="1" style="width:60px;padding:4px;border:1px solid #ccc;border-radius:4px;text-align:center;font-size:14px">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>รายการรายรับ (แก้ไขได้)</h2>
+    <div class="notice">คลิกที่ช่องเพื่อแก้ไข — กรอกรายละเอียดสินค้าสำหรับออกใบเสร็จ</div>
+    <table id="incomeTable">
+      <thead><tr>
+        <th style="width:30px">#</th>
+        <th style="width:100px">วันที่</th>
+        <th>ชื่อลูกค้า</th>
+        <th>รายละเอียดสินค้า</th>
+        <th style="width:60px">จำนวน</th>
+        <th style="width:90px">ราคา/หน่วย</th>
+        <th class="num" style="width:100px">ยอดรวม</th>
+        <th style="width:50px">ลบ</th>
+      </tr></thead>
+      <tbody id="incomeBody">
+        <tr><td colspan="8" style="text-align:center;color:#aaa;padding:20px">ยังไม่มีรายการ — นำเข้าจาก Statement หรือเพิ่มด้วยตนเอง</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- TAB: EXPENSE -->
+<div id="tab-expense" style="display:none">
+  <div class="card">
+    <h2>รายจ่าย — ซื้อสินค้า</h2>
+    <table id="expGoodsTable">
+      <thead><tr>
+        <th style="width:30px">#</th>
+        <th style="width:100px">วันที่</th>
+        <th>รายการ</th>
+        <th class="num" style="width:120px">จำนวนเงิน (บาท)</th>
+        <th>หมายเหตุ</th>
+        <th style="width:50px">ลบ</th>
+      </tr></thead>
+      <tbody id="expGoodsBody"></tbody>
+    </table>
+    <button class="btn btn-outline btn-sm" style="margin-top:10px" onclick="addExpRow('goods')">+ เพิ่มรายการ</button>
+  </div>
+
+  <div class="card">
+    <h2>รายจ่าย — ค่าใช้จ่ายอื่นๆ</h2>
+    <table id="expOtherTable">
+      <thead><tr>
+        <th style="width:30px">#</th>
+        <th style="width:100px">วันที่</th>
+        <th>รายการ</th>
+        <th class="num" style="width:120px">จำนวนเงิน (บาท)</th>
+        <th>หมายเหตุ</th>
+        <th style="width:50px">ลบ</th>
+      </tr></thead>
+      <tbody id="expOtherBody"></tbody>
+    </table>
+    <button class="btn btn-outline btn-sm" style="margin-top:10px" onclick="addExpRow('other')">+ เพิ่มรายการ</button>
+  </div>
+</div>
+
+<!-- TAB: SLIPS -->
+<div id="tab-slips" style="display:none">
+  <div class="card">
+    <h2>สลิปรับเงิน (จากลูกค้า)</h2>
+    <div class="upload-area" onclick="document.getElementById('slipInInput').click()">
+      <div style="font-size:32px">📸</div>
+      <div>คลิกเพื่อเพิ่มสลิปรับเงิน</div>
+      <div style="font-size:12px;color:#aaa">รองรับ JPG, PNG</div>
+    </div>
+    <input type="file" id="slipInInput" accept="image/*" multiple style="display:none" onchange="addSlips('in',this.files)">
+    <div class="slip-grid" id="slipInGrid"></div>
+  </div>
+
+  <div class="card">
+    <h2>สลิปจ่ายเงิน (ค่าใช้จ่าย)</h2>
+    <div class="upload-area" onclick="document.getElementById('slipOutInput').click()">
+      <div style="font-size:32px">📸</div>
+      <div>คลิกเพื่อเพิ่มสลิปจ่ายเงิน</div>
+    </div>
+    <input type="file" id="slipOutInput" accept="image/*" multiple style="display:none" onchange="addSlips('out',this.files)">
+    <div class="slip-grid" id="slipOutGrid"></div>
+  </div>
+</div>
+
+<!-- TAB: PRINT -->
+<div id="tab-print" style="display:none">
+  <div class="summary-box">
+    <div class="summary-card">
+      <div class="label">รายรับรวม</div>
+      <div class="amount income-color" id="sumIncome2">฿0</div>
+    </div>
+    <div class="summary-card">
+      <div class="label">รายจ่ายรวม</div>
+      <div class="amount expense-color" id="sumExpense2">฿0</div>
+    </div>
+    <div class="summary-card">
+      <div class="label">กำไร (ขาดทุน)</div>
+      <div class="amount profit-color" id="sumProfit2">฿0</div>
+    </div>
+  </div>
+
+  <div class="print-grid">
+    <div class="print-card">
+      <div class="icon">🧾</div>
+      <h3>ใบเสร็จรับเงิน</h3>
+      <p>ออกทีละ 1 ใบต่อ 1 รายการรับเงิน<br>เลือกรายการที่ต้องการพิมพ์</p>
+      <select id="receiptSelect" style="width:100%;padding:6px;border:1px solid #ccc;border-radius:4px;margin-bottom:10px;font-family:inherit;font-size:13px">
+        <option value="all">ทุกรายการ</option>
+      </select>
+      <button class="btn btn-primary" style="width:100%" onclick="printReceipts()">🖨 พิมพ์ใบเสร็จ</button>
+    </div>
+
+    <div class="print-card">
+      <div class="icon">📋</div>
+      <h3>ใบรับรองแทนใบเสร็จ</h3>
+      <p>รวมหลายรายการในใบเดียวได้<br>เลือกรายการที่ต้องการ</p>
+      <div id="certChecks" style="text-align:left;max-height:120px;overflow-y:auto;border:1px solid #eee;border-radius:4px;padding:8px;margin-bottom:10px;font-size:12px"></div>
+      <div style="margin-bottom:8px">
+        <label style="font-size:12px">บริษัท/ผู้ซื้อ:</label>
+        <input type="text" id="certBuyer" value="บริษัท ปูจิ 689 จำกัด" style="width:100%;padding:5px;border:1px solid #ccc;border-radius:4px;font-family:inherit;font-size:12px;margin-top:3px">
+      </div>
+      <button class="btn btn-primary" style="width:100%" onclick="printCertificate()">🖨 พิมพ์ใบรับรองฯ</button>
+    </div>
+
+    <div class="print-card">
+      <div class="icon">📊</div>
+      <h3>รายงานรายรับรายจ่าย</h3>
+      <p>ตารางสรุปรับ-จ่ายประจำเดือน<br>พร้อมสรุปกำไร/ขาดทุน</p>
+      <button class="btn btn-primary" style="width:100%" onclick="printReport()">🖨 พิมพ์รายงาน</button>
+    </div>
+
+    <div class="print-card">
+      <div class="icon">🖼</div>
+      <h3>จัดสลิปลงหน้า A4</h3>
+      <p>จัด 2 สลิปต่อ 1 หน้า A4<br>พร้อมสำหรับแนบเอกสาร</p>
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <button class="btn btn-outline btn-sm" style="flex:1" onclick="printSlips('in')">สลิปรับเงิน</button>
+        <button class="btn btn-outline btn-sm" style="flex:1" onclick="printSlips('out')">สลิปจ่ายเงิน</button>
+      </div>
+      <button class="btn btn-primary" style="width:100%" onclick="printSlips('all')">🖨 พิมพ์ทั้งหมด</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- end content -->
+
+<!-- ===== PRINT AREA ===== -->
+<div class="print-area" id="printArea"></div>
+
+<script>
+// ============================================================
+// STATE
+// ============================================================
+const COMPANY = {
+  name: 'บริษัท ฝูจี๋ 689 จำกัด',
+  addr: 'สำนักงานใหญ่ : 5/54 หมู่ที่ 6 แขวงหลักสอง เขตหลักสี่ กรุงเทพมหานคร 10210',
+  tax: '0105565012308'
+};
+
+let incomeRows = [];   // {id, date, customer, desc, qty, unitPrice, amount}
+let expGoods = [];     // {id, date, desc, amount, note}
+let expOther = [];     // {id, date, desc, amount, note}
+let slipsIn = [];      // {src, label}
+let slipsOut = [];
+
+let extractedRows = [];
+let nextId = 1;
+
+// ============================================================
+// TABS
+// ============================================================
+function showTab(t){
+  ['import','income','expense','slips','print'].forEach(x=>{
+    document.getElementById('tab-'+x).style.display = x===t?'':'none';
+  });
+  document.querySelectorAll('.tab').forEach((el,i)=>{
+    el.classList.toggle('active', ['import','income','expense','slips','print'][i]===t);
+  });
+  if(t==='income') renderIncome();
+  if(t==='expense') renderExpense();
+  if(t==='slips') renderSlips();
+  if(t==='print') renderPrint();
+}
+
+// ============================================================
+// PDF PARSE (KBank)
+// ============================================================
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+async function parsePDF(file){
+  const status = document.getElementById('parseStatus');
+  status.textContent = '⏳ กำลังอ่าน PDF...';
+  try {
+    const buf = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({data: buf}).promise;
+    let allText = [];
+    for(let p=1;p<=pdf.numPages;p++){
+      const page = await pdf.getPage(p);
+      const tc = await page.getTextContent();
+      // Get items sorted by y (descending) then x
+      const items = tc.items.map(i=>({str:i.str.trim(), x:i.transform[4], y:i.transform[5]}));
+      items.sort((a,b)=> b.y-a.y || a.x-b.x);
+      // Group into lines by y proximity
+      let lines=[], curY=null, curLine=[];
+      items.forEach(item=>{
+        if(!item.str) return;
+        if(curY===null || Math.abs(item.y-curY)>4){
+          if(curLine.length) lines.push(curLine.join(' '));
+          curLine=[item.str]; curY=item.y;
+        } else {
+          curLine.push(item.str);
+        }
+      });
+      if(curLine.length) lines.push(curLine.join(' '));
+      allText = allText.concat(lines);
+    }
+    extractedRows = parseKBankLines(allText);
+    if(extractedRows.length===0){
+      status.innerHTML = '⚠️ ไม่พบรายการโอนเข้า — ลองเพิ่มด้วยตนเองในแท็บ "นำเข้า Statement" ด้านล่าง<br><small style="color:#aaa">Raw text: '+allText.slice(0,5).join(' | ')+'</small>';
+    } else {
+      status.textContent = `✅ พบรายการโอนเข้า ${extractedRows.length} รายการ`;
+      renderExtracted();
+    }
+  } catch(e){
+    status.textContent = '❌ อ่านไฟล์ไม่ได้: '+e.message;
+  }
+}
+
+function parseKBankLines(lines){
+  const results = [];
+  // KBank deposit patterns: look for lines with date + amount
+  // Common formats: DD/MM/YY or DD/MM/YYYY
+  const dateRe = /(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})/;
+  const amountRe = /(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/g;
+
+  // Keywords indicating deposit/income
+  const incomeKw = ['โอนเงิน','รับโอน','ฝาก','deposit','credit','transfer in','เงินโอน'];
+
+  lines.forEach(line=>{
+    const lo = line.toLowerCase();
+    const hasIncome = incomeKw.some(k=> lo.includes(k));
+    const dateMatch = line.match(dateRe);
+
+    if(dateMatch && hasIncome){
+      // Extract all numbers
+      const nums = [];
+      let m;
+      const re = /(\d{1,3}(?:,\d{3})*\.\d{2})/g;
+      while((m=re.exec(line))!==null) nums.push(parseFloat(m[1].replace(/,/g,'')));
+
+      // Usually last 2-3 numbers are withdrawal, deposit, balance
+      // Pick the deposit amount (second-to-last or last non-balance)
+      let amount = 0;
+      if(nums.length >= 2) amount = nums[nums.length-2];
+      else if(nums.length === 1) amount = nums[0];
+
+      if(amount > 0){
+        // Parse date
+        let [_,d,mo,y] = dateMatch;
+        if(y.length===2) y='25'+y; // Buddhist year short form
+        const thYear = parseInt(y);
+        const ceYear = thYear > 2500 ? thYear - 543 : thYear;
+        const dateStr = `${ceYear}-${mo.padStart(2,'0')}-${d.padStart(2,'0')}`;
+
+        // Extract name: remove date, numbers, keywords — what's left is likely the name
+        let desc = line
+          .replace(dateRe,'')
+          .replace(/(\d{1,3}(?:,\d{3})*\.\d{2})/g,'')
+          .replace(/โอนเงิน|รับโอน|ฝาก|เงินโอน/g,'')
+          .replace(/\s+/g,' ').trim();
+
+        results.push({date:dateStr, customer:desc, amount});
+      }
+    }
+  });
+  return results;
+}
+
+function renderExtracted(){
+  const card = document.getElementById('extractedCard');
+  card.style.display='';
+  document.getElementById('extractCount').textContent = `(${extractedRows.length} รายการ)`;
+  const body = document.getElementById('extractedBody');
+  body.innerHTML = extractedRows.map((r,i)=>`
+    <tr>
+      <td><input type="date" value="${r.date}" onchange="extractedRows[${i}].date=this.value"></td>
+      <td><input type="text" value="${r.customer}" onchange="extractedRows[${i}].customer=this.value" style="min-width:140px"></td>
+      <td><input type="text" value="" placeholder="รายละเอียดสินค้า..." onchange="extractedRows[${i}].desc=this.value" style="min-width:140px"></td>
+      <td class="num">${fmtNum(r.amount)}</td>
+      <td><button class="btn btn-success btn-sm" onclick="importOne(${i})">นำเข้า</button></td>
+    </tr>
+  `).join('');
+}
+
+function importOne(i){
+  const r = extractedRows[i];
+  incomeRows.push({
+    id: nextId++,
+    date: r.date,
+    customer: r.customer,
+    desc: r.desc||'',
+    qty: 1,
+    unitPrice: r.amount,
+    amount: r.amount
+  });
+  showTab('income');
+}
+
+function importAll(){
+  extractedRows.forEach((r,i)=>{
+    // Read current values from table
+    const rows = document.getElementById('extractedBody').querySelectorAll('tr');
+    if(rows[i]){
+      const inputs = rows[i].querySelectorAll('input');
+      r.date = inputs[0].value;
+      r.customer = inputs[1].value;
+      r.desc = inputs[2].value;
+    }
+    incomeRows.push({
+      id: nextId++,
+      date: r.date,
+      customer: r.customer,
+      desc: r.desc||'',
+      qty: 1,
+      unitPrice: r.amount,
+      amount: r.amount
+    });
+  });
+  showTab('income');
+}
+
+function addManualIncome(){
+  const date = document.getElementById('mDate').value;
+  const name = document.getElementById('mName').value.trim();
+  const amount = parseFloat(document.getElementById('mAmount').value)||0;
+  if(!name||!amount){alert('กรุณากรอกชื่อและยอดเงิน');return;}
+  incomeRows.push({id:nextId++, date, customer:name, desc:'', qty:1, unitPrice:amount, amount});
+  document.getElementById('mName').value='';
+  document.getElementById('mAmount').value='';
+  showTab('income');
+}
+
+// ============================================================
+// INCOME TABLE
+// ============================================================
+function renderIncome(){
+  const body = document.getElementById('incomeBody');
+  if(!incomeRows.length){
+    body.innerHTML='<tr><td colspan="8" style="text-align:center;color:#aaa;padding:20px">ยังไม่มีรายการ</td></tr>';
+    document.getElementById('sumIncome').textContent='฿0';
+    document.getElementById('sumCount').textContent='0';
+    return;
+  }
+  body.innerHTML = incomeRows.map((r,i)=>`
+    <tr>
+      <td>${i+1}</td>
+      <td><input type="date" value="${r.date}" onchange="incomeRows[${i}].date=this.value;calcIncome(${i})"></td>
+      <td><input type="text" value="${r.customer}" onchange="incomeRows[${i}].customer=this.value" style="min-width:120px"></td>
+      <td><input type="text" value="${r.desc}" placeholder="ชื่อสินค้า/บริการ..." onchange="incomeRows[${i}].desc=this.value" style="min-width:120px"></td>
+      <td><input type="number" value="${r.qty}" min="1" style="text-align:right" onchange="incomeRows[${i}].qty=+this.value;calcIncome(${i})"></td>
+      <td><input type="number" value="${r.unitPrice}" style="text-align:right" onchange="incomeRows[${i}].unitPrice=+this.value;calcIncome(${i})"></td>
+      <td class="num" id="iamt${r.id}">${fmtNum(r.amount)}</td>
+      <td><button class="btn btn-danger" onclick="removeIncome(${i})">ลบ</button></td>
+    </tr>
+  `).join('');
+  const total = incomeRows.reduce((s,r)=>s+r.amount,0);
+  document.getElementById('sumIncome').textContent = '฿'+fmtNum(total);
+  document.getElementById('sumCount').textContent = incomeRows.length;
+}
+
+function calcIncome(i){
+  const r = incomeRows[i];
+  r.amount = r.qty * r.unitPrice;
+  const el = document.getElementById('iamt'+r.id);
+  if(el) el.textContent = fmtNum(r.amount);
+  const total = incomeRows.reduce((s,r)=>s+r.amount,0);
+  document.getElementById('sumIncome').textContent='฿'+fmtNum(total);
+}
+
+function removeIncome(i){
+  incomeRows.splice(i,1); renderIncome();
+}
+
+// ============================================================
+// EXPENSE TABLE
+// ============================================================
+function addExpRow(type){
+  const today = new Date().toISOString().slice(0,10);
+  const row = {id:nextId++, date:today, desc:'', amount:0, note:''};
+  if(type==='goods') expGoods.push(row);
+  else expOther.push(row);
+  renderExpense();
+}
+
+function renderExpense(){
+  renderExpTable('goods', expGoods, 'expGoodsBody');
+  renderExpTable('other', expOther, 'expOtherBody');
+}
+
+function renderExpTable(type, arr, bodyId){
+  const body = document.getElementById(bodyId);
+  if(!arr.length){
+    body.innerHTML=`<tr><td colspan="6" style="text-align:center;color:#aaa;padding:12px">ยังไม่มีรายการ</td></tr>`;
+    return;
+  }
+  body.innerHTML = arr.map((r,i)=>`
+    <tr>
+      <td>${i+1}</td>
+      <td><input type="date" value="${r.date}" onchange="${type==='goods'?'expGoods':'expOther'}[${i}].date=this.value"></td>
+      <td><input type="text" value="${r.desc}" placeholder="รายการ..." onchange="${type==='goods'?'expGoods':'expOther'}[${i}].desc=this.value" style="min-width:150px"></td>
+      <td><input type="number" value="${r.amount}" style="text-align:right" onchange="${type==='goods'?'expGoods':'expOther'}[${i}].amount=+this.value"></td>
+      <td><input type="text" value="${r.note}" placeholder="หมายเหตุ..." onchange="${type==='goods'?'expGoods':'expOther'}[${i}].note=this.value"></td>
+      <td><button class="btn btn-danger" onclick="removeExp('${type}',${i})">ลบ</button></td>
+    </tr>
+  `).join('');
+}
+
+function removeExp(type,i){
+  if(type==='goods') expGoods.splice(i,1);
+  else expOther.splice(i,1);
+  renderExpense();
+}
+
+// ============================================================
+// SLIPS
+// ============================================================
+function addSlips(type, files){
+  Array.from(files).forEach(f=>{
+    const reader = new FileReader();
+    reader.onload = e=>{
+      if(type==='in') slipsIn.push({src:e.target.result, label:'สลิปรับเงิน'});
+      else slipsOut.push({src:e.target.result, label:'สลิปจ่ายเงิน'});
+      renderSlips();
+    };
+    reader.readAsDataURL(f);
+  });
+}
+
+function renderSlips(){
+  renderSlipGrid('in', slipsIn, 'slipInGrid');
+  renderSlipGrid('out', slipsOut, 'slipOutGrid');
+}
+
+function renderSlipGrid(type, arr, gridId){
+  const grid = document.getElementById(gridId);
+  grid.innerHTML = arr.map((s,i)=>`
+    <div class="slip-item">
+      <img src="${s.src}" alt="slip ${i+1}">
+      <div class="slip-label">
+        <input type="text" value="${s.label}" style="width:100%;border:none;font-size:11px;font-family:inherit" onchange="${type==='in'?'slipsIn':'slipsOut'}[${i}].label=this.value">
+      </div>
+      <button class="slip-remove" onclick="removeSlip('${type}',${i})">×</button>
+    </div>
+  `).join('');
+}
+
+function removeSlip(type,i){
+  if(type==='in') slipsIn.splice(i,1);
+  else slipsOut.splice(i,1);
+  renderSlips();
+}
+
+// ============================================================
+// PRINT TAB
+// ============================================================
+function renderPrint(){
+  const totalIn = incomeRows.reduce((s,r)=>s+r.amount,0);
+  const totalGoods = expGoods.reduce((s,r)=>s+r.amount,0);
+  const totalOther = expOther.reduce((s,r)=>s+r.amount,0);
+  const totalExp = totalGoods + totalOther;
+  const profit = totalIn - totalExp;
+
+  document.getElementById('sumIncome2').textContent = '฿'+fmtNum(totalIn);
+  document.getElementById('sumExpense2').textContent = '฿'+fmtNum(totalExp);
+  document.getElementById('sumProfit2').textContent = (profit>=0?'฿':'฿-')+fmtNum(Math.abs(profit));
+  document.getElementById('sumProfit2').style.color = profit>=0?'#1a5276':'#c0392b';
+
+  // Receipt select
+  const sel = document.getElementById('receiptSelect');
+  sel.innerHTML = '<option value="all">ทุกรายการ</option>' +
+    incomeRows.map((r,i)=>`<option value="${i}">${r.date} — ${r.customer} — ฿${fmtNum(r.amount)}</option>`).join('');
+
+  // Certificate checkboxes
+  const certDiv = document.getElementById('certChecks');
+  if(!incomeRows.length){
+    certDiv.innerHTML='<div style="color:#aaa">ยังไม่มีรายการรายรับ</div>';
+  } else {
+    certDiv.innerHTML = incomeRows.map((r,i)=>`
+      <label style="display:block;margin-bottom:4px">
+        <input type="checkbox" checked value="${i}"> ${r.date} — ${r.customer} — ฿${fmtNum(r.amount)}
+      </label>
+    `).join('');
+  }
+}
+
+// ============================================================
+// PRINT FUNCTIONS
+// ============================================================
+function getMonthLabel(){
+  const months=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน',
+                'กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+  const m = parseInt(document.getElementById('selMonth').value)-1;
+  const y = document.getElementById('selYear').value;
+  return months[m]+' '+y;
+}
+
+function printReceipts(){
+  const selVal = document.getElementById('receiptSelect').value;
+  const rows = selVal==='all' ? incomeRows : [incomeRows[parseInt(selVal)]];
+  if(!rows.length){alert('ไม่มีรายการ');return;}
+
+  let bookNo = parseInt(document.getElementById('bookNo').value);
+  let receiptNo = parseInt(document.getElementById('receiptNo').value);
+
+  let html = rows.map(r=>{
+    const no = String(receiptNo++).padStart(3,'0');
+    const total = r.amount;
+    return `
+    <div class="doc-page">
+      <div class="doc-title">ใบเสร็จรับเงิน</div>
+      <div class="doc-company">${COMPANY.name}</div>
+      <div class="doc-company" style="font-size:10pt">${COMPANY.addr}</div>
+      <div class="doc-company" style="font-size:10pt">เลขประจำตัวผู้เสียภาษีอากร ${COMPANY.tax}</div>
+      <hr style="margin:8px 0">
+      <div class="doc-header-row">
+        <div>
+          <div class="doc-field"><span>นามลูกค้า/Customer :</span> <strong>${r.customer}</strong></div>
+          <div class="doc-field"><span>ที่อยู่/Address :</span></div>
+          <div class="doc-field"><span>เลขประจำตัวผู้เสียภาษี/Tax ID :</span></div>
+        </div>
+        <div style="text-align:right">
+          <div class="doc-field">วันที่/Date : <strong>${formatDateTH(r.date)}</strong></div>
+          <div class="doc-field">เล่มที่/No. : <strong>${bookNo}</strong></div>
+          <div class="doc-field">เลขที่/No. : <strong>${no}</strong></div>
+        </div>
+      </div>
+      <table class="doc-table" style="margin-top:12px">
+        <thead><tr>
+          <th style="width:40px">ลำดับ<br>No.</th>
+          <th>รายละเอียด<br>Description</th>
+          <th style="width:70px">จำนวน<br>Quantity</th>
+          <th style="width:90px">ราคาต่อหน่วย<br>Unit/Price</th>
+          <th style="width:100px">จำนวนเงิน<br>Amount</th>
+        </tr></thead>
+        <tbody>
+          <tr>
+            <td style="text-align:center">1</td>
+            <td>${r.desc||'-'}</td>
+            <td style="text-align:right">${r.qty}</td>
+            <td style="text-align:right">${fmtNum(r.unitPrice)}</td>
+            <td style="text-align:right">${fmtNum(total)}</td>
+          </tr>
+          ${Array(4).fill('<tr><td></td><td></td><td></td><td></td><td></td></tr>').join('')}
+        </tbody>
+        <tfoot>
+          <tr class="doc-total-row">
+            <td colspan="3">ตัวอักษร ${bahtText(total)}</td>
+            <td style="text-align:right;font-weight:700">รวม Total</td>
+            <td style="text-align:right">${fmtNum(total)}</td>
+          </tr>
+        </tfoot>
+      </table>
+      <div class="doc-sig-row" style="margin-top:60px">
+        <div class="doc-sig">
+          <div class="doc-sig-line"></div>
+          <div>ผู้อนุมัติ</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  openPrint(html);
+}
+
+function printCertificate(){
+  const checks = document.querySelectorAll('#certChecks input[type=checkbox]:checked');
+  const selected = Array.from(checks).map(cb=> incomeRows[parseInt(cb.value)]).filter(Boolean);
+  if(!selected.length){alert('เลือกรายการอย่างน้อย 1 รายการ');return;}
+
+  const buyer = document.getElementById('certBuyer').value;
+  const total = selected.reduce((s,r)=>s+r.amount,0);
+  const dates = selected.map(r=>r.date).sort();
+  const fromDate = formatDateTH(dates[0]);
+  const toDate = formatDateTH(dates[dates.length-1]);
+
+  const rows = selected.map((r,i)=>`
+    <tr>
+      <td style="text-align:center">${formatDateTH(r.date)}</td>
+      <td>${r.desc||r.customer}</td>
+      <td style="text-align:right">${fmtNum(r.amount)}</td>
+      <td>${r.customer}</td>
+    </tr>
+  `).join('');
+
+  const emptyRows = Array(Math.max(0,10-selected.length))
+    .fill('<tr><td style="height:22px"></td><td></td><td></td><td></td></tr>').join('');
+
+  const html = `
+  <div class="doc-page">
+    <div class="doc-title">ใบรับรองแทนใบเสร็จรับเงิน</div>
+    <div style="text-align:center;margin-bottom:16px;font-size:12pt">
+      บจ./หจก. <u>${buyer}</u> (ผู้ซื้อ/ผู้รับบริการ)
+    </div>
+    <table class="doc-table">
+      <thead><tr>
+        <th style="width:120px">วัน/เดือน/ปี</th>
+        <th>รายละเอียดรายจ่าย</th>
+        <th style="width:110px">จำนวนเงิน</th>
+        <th style="width:120px">หมายเหตุ</th>
+      </tr></thead>
+      <tbody>${rows}${emptyRows}
+        <tr class="doc-total-row">
+          <td colspan="2" style="text-align:right">รวมทั้งสิ้น</td>
+          <td style="text-align:right">${fmtNum(total)}</td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="doc-field" style="margin-top:10px">
+      <strong>รวมทั้งสิ้น (ตัวอักษร)</strong> ${bahtText(total)}
+    </div>
+    <div class="doc-field" style="margin-top:12px">
+      ข้าพเจ้า ................................................................ (ผู้เบิกจ่าย)&nbsp;&nbsp; ตำแหน่ง ...........................................
+    </div>
+    <div style="margin-top:8px;font-size:11pt;line-height:1.8">
+      ขอรับรองว่า รายจ่ายข้างต้นนี้ไม่อาจเรียกเก็บใบเสร็จรับเงินจากผู้รับได้ และข้าพเจ้าได้จ่ายไปในงานของทาง
+    </div>
+    <div style="margin-top:4px;font-size:11pt">
+      ${COMPANY.name} โดยแท้ ตั้งแต่วันที่ <u>${fromDate}</u> ถึงวันที่ <u>${toDate}</u>
+    </div>
+    <div class="doc-sig-row" style="margin-top:30px">
+      <div style="flex:2"></div>
+      <div class="doc-sig" style="flex:3">
+        <div class="doc-sig-line"></div>
+        <div>(ผู้เบิกจ่าย)</div>
+      </div>
+    </div>
+    <div class="doc-sig-row" style="margin-top:20px">
+      <div style="flex:2"></div>
+      <div class="doc-sig" style="flex:3">
+        <div class="doc-sig-line"></div>
+        <div>(ผู้อนุมัติ)</div>
+      </div>
+    </div>
+  </div>`;
+
+  openPrint(html);
+}
+
+function printReport(){
+  const month = getMonthLabel();
+  const allRows = [
+    ...incomeRows.map(r=>({date:r.date, desc:r.customer+(r.desc?' — '+r.desc:''), income:r.amount, goods:0, other:0, note:''})),
+    ...expGoods.map(r=>({date:r.date, desc:r.desc, income:0, goods:r.amount, other:0, note:r.note})),
+    ...expOther.map(r=>({date:r.date, desc:r.desc, income:0, goods:0, other:r.amount, note:r.note}))
+  ].sort((a,b)=>a.date.localeCompare(b.date));
+
+  const totalIn = allRows.reduce((s,r)=>s+r.income,0);
+  const totalGoods = allRows.reduce((s,r)=>s+r.goods,0);
+  const totalOther = allRows.reduce((s,r)=>s+r.other,0);
+  const profit = totalIn - totalGoods - totalOther;
+
+  const rows = allRows.map((r,i)=>`
+    <tr>
+      <td style="text-align:center">${formatDateTH(r.date)}</td>
+      <td>${r.desc}</td>
+      <td style="text-align:right">${r.income?fmtNum(r.income):''}</td>
+      <td style="text-align:right">${r.goods?fmtNum(r.goods):''}</td>
+      <td style="text-align:right">${r.other?fmtNum(r.other):''}</td>
+      <td>${r.note}</td>
+    </tr>
+  `).join('');
+
+  const empty = Array(Math.max(0,15-allRows.length))
+    .fill('<tr><td style="height:22px"></td><td></td><td></td><td></td><td></td><td></td></tr>').join('');
+
+  const html = `
+  <div class="doc-page">
+    <div class="doc-title">รายรับ - รายจ่ายสำหรับเดือน ${month}</div>
+    <div style="text-align:center;margin-bottom:8px;font-size:11pt">${COMPANY.name}</div>
+    <table class="doc-table">
+      <thead>
+        <tr>
+          <th rowspan="2" style="width:110px">วัน/เดือน/ปี</th>
+          <th rowspan="2">รายการ</th>
+          <th rowspan="2" style="width:110px">รายรับ (บาท)</th>
+          <th colspan="2" style="text-align:center">รายจ่าย (บาท)</th>
+          <th rowspan="2" style="width:100px">หมายเหตุ</th>
+        </tr>
+        <tr>
+          <th style="width:110px">ซื้อสินค้า</th>
+          <th style="width:110px">ค่าใช้จ่ายอื่นๆ</th>
+        </tr>
+      </thead>
+      <tbody>${rows}${empty}
+        <tr class="doc-total-row">
+          <td colspan="2" style="text-align:right">รวม</td>
+          <td style="text-align:right">${fmtNum(totalIn)}</td>
+          <td style="text-align:right">${fmtNum(totalGoods)}</td>
+          <td style="text-align:right">${fmtNum(totalOther)}</td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="margin-top:16px;font-size:11pt">
+      <div><u>สรุป</u> รายรับ - รายจ่ายสำหรับเดือน ${month}</div>
+      <div style="margin-top:8px;display:grid;grid-template-columns:200px 1fr;gap:4px">
+        <span>รายรับ &nbsp;&nbsp; ขายสินค้า</span><span>${fmtNum(totalIn)} บาท</span>
+        <span>รายจ่าย &nbsp; ซื้อสินค้า</span><span>${fmtNum(totalGoods)} บาท</span>
+        <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ค่าใช้จ่ายอื่นๆ</span><span>${fmtNum(totalOther)} บาท</span>
+      </div>
+      <div style="margin-top:10px;font-weight:700;font-size:13pt">
+        กำไร (ขาดทุน) &nbsp;&nbsp; ${profit>=0?'':'-'}${fmtNum(Math.abs(profit))} บาท
+      </div>
+    </div>
+  </div>`;
+
+  openPrint(html);
+}
+
+function printSlips(type){
+  let arr = [];
+  if(type==='in') arr=slipsIn;
+  else if(type==='out') arr=slipsOut;
+  else arr=[...slipsIn,...slipsOut];
+
+  if(!arr.length){alert('ไม่มีสลิป');return;}
+
+  // 2 slips per page
+  let pages = '';
+  for(let i=0;i<arr.length;i+=2){
+    const s1 = arr[i];
+    const s2 = arr[i+1];
+    pages += `
+    <div class="doc-page" style="display:flex;flex-direction:column;gap:16px;padding:2cm">
+      <div style="flex:1;border:1px solid #ddd;border-radius:4px;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center">
+        <img src="${s1.src}" style="max-width:100%;max-height:11cm;object-fit:contain">
+        <div style="font-size:10pt;padding:6px;color:#555">${s1.label}</div>
+      </div>
+      ${s2?`<div style="flex:1;border:1px solid #ddd;border-radius:4px;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center">
+        <img src="${s2.src}" style="max-width:100%;max-height:11cm;object-fit:contain">
+        <div style="font-size:10pt;padding:6px;color:#555">${s2.label}</div>
+      </div>`:'<div style="flex:1"></div>'}
+    </div>`;
+  }
+  openPrint(pages);
+}
+
+function openPrint(html){
+  const w = window.open('','_blank','width=900,height=700');
+  w.document.write(`<!DOCTYPE html><html lang="th"><head>
+    <meta charset="UTF-8">
+    <style>
+      *{box-sizing:border-box;margin:0;padding:0}
+      body{font-family:'Leelawadee UI','Leelawadee',Tahoma,sans-serif;font-size:12pt;background:#f0f0f0}
+      .doc-page{width:21cm;min-height:29cm;padding:1.5cm 2cm;background:#fff;margin:10px auto;page-break-after:always;
+        font-family:'Leelawadee UI','Leelawadee',Tahoma,sans-serif}
+      .doc-title{text-align:center;font-size:16pt;font-weight:700;margin-bottom:10px}
+      .doc-company{font-size:10pt;margin-bottom:2px}
+      .doc-table{width:100%;border-collapse:collapse;margin:8px 0;font-size:11pt}
+      .doc-table th,.doc-table td{border:1px solid #000;padding:5px 7px}
+      .doc-table th{background:#f0c090;font-weight:700;text-align:center}
+      .doc-header-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+      .doc-field{margin-bottom:4px;font-size:11pt}
+      .doc-sig-row{display:flex;justify-content:space-between;margin-top:24px}
+      .doc-sig{text-align:center;flex:1}
+      .doc-sig-line{border-top:1px solid #000;width:160px;margin:0 auto 5px}
+      .doc-total-row td{font-weight:700;background:#f5f5f5}
+      .no-print{text-align:center;padding:12px;background:#1a5276;color:#fff}
+      button{padding:8px 20px;font-size:14px;cursor:pointer;border:none;border-radius:4px;background:#fff;color:#1a5276;font-weight:700;margin:0 4px}
+      @media print{.no-print{display:none}.doc-page{margin:0;box-shadow:none}}
+    </style>
+  </head><body>
+    <div class="no-print">
+      <button onclick="window.print()">🖨 พิมพ์</button>
+      <button onclick="window.close()">✕ ปิด</button>
+    </div>
+    ${html}
+  </body></html>`);
+  w.document.close();
+}
+
+// ============================================================
+// HELPERS
+// ============================================================
+function fmtNum(n){
+  return (n||0).toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+
+function formatDateTH(dateStr){
+  if(!dateStr) return '';
+  try {
+    const [y,m,d] = dateStr.split('-');
+    const months=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+    return `${parseInt(d)} ${months[parseInt(m)-1]} ${parseInt(y)+543}`;
+  } catch(e){ return dateStr; }
+}
+
+function bahtText(amount){
+  const ones=['','หนึ่ง','สอง','สาม','สี่','ห้า','หก','เจ็ด','แปด','เก้า'];
+  function cvtBelow1000(n){
+    if(!n) return '';
+    let r='';
+    const h=Math.floor(n/100), t=Math.floor((n%100)/10), u=n%10;
+    if(h) r+=ones[h]+'ร้อย';
+    if(t===2) r+='ยี่สิบ';
+    else if(t===1) r+='สิบ';
+    else if(t>2) r+=ones[t]+'สิบ';
+    if(u===1&&t) r+='เอ็ด';
+    else if(u) r+=ones[u];
+    return r;
+  }
+  function cvt(n){
+    if(!n) return 'ศูนย์';
+    let r='';
+    if(n>=1000000){r+=cvt(Math.floor(n/1000000))+'ล้าน';n%=1000000;}
+    if(n>=100000){r+=ones[Math.floor(n/100000)]+'แสน';n%=100000;}
+    if(n>=10000){r+=ones[Math.floor(n/10000)]+'หมื่น';n%=10000;}
+    if(n>=1000){r+=ones[Math.floor(n/1000)]+'พัน';n%=1000;}
+    r+=cvtBelow1000(n);
+    return r;
+  }
+  const v=Math.round(amount*100)/100;
+  const b=Math.floor(v), s=Math.round((v-b)*100);
+  return cvt(b)+'บาท'+(s?cvt(s)+'สตางค์':'ถ้วน');
+}
+
+function clearMonth(){
+  if(!confirm('ล้างข้อมูลทั้งเดือน?')) return;
+  incomeRows=[]; expGoods=[]; expOther=[]; slipsIn=[]; slipsOut=[]; extractedRows=[];
+  document.getElementById('extractedCard').style.display='none';
+  document.getElementById('parseStatus').textContent='';
+  renderIncome(); renderExpense(); renderSlips();
+}
+
+// Drag & drop
+const ua = document.getElementById('uploadArea');
+ua.addEventListener('dragover',e=>{e.preventDefault();ua.style.borderColor='#1a5276'});
+ua.addEventListener('dragleave',()=>{ua.style.borderColor='#aaa'});
+ua.addEventListener('drop',e=>{e.preventDefault();ua.style.borderColor='#aaa';if(e.dataTransfer.files[0]) parsePDF(e.dataTransfer.files[0])});
+
+// Set current month/year
+const now = new Date();
+document.getElementById('selMonth').value = now.getMonth()+1;
+document.getElementById('selYear').value = now.getFullYear()+543;
+</script>
+</body>
+</html>
