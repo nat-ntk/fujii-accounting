@@ -127,7 +127,9 @@ td input:focus,td select:focus{outline:1px solid #1a5276;border-radius:2px;backg
       <option value="11">พฤศจิกายน</option><option value="12">ธันวาคม</option>
     </select>
     <input type="number" id="selYear" value="2568" style="width:70px">
-    <button class="btn btn-outline btn-sm" onclick="clearMonth()">ล้างข้อมูล</button>
+    <button class="btn btn-outline btn-sm" onclick="exportData()" title="บันทึกข้อมูลเป็นไฟล์">💾 Export</button>
+  <label class="btn btn-outline btn-sm" style="cursor:pointer" title="โหลดข้อมูลจากไฟล์">📂 Import<input type="file" accept=".json" style="display:none" onchange="importData(this)"></label>
+  <button class="btn btn-outline btn-sm" onclick="clearMonth()">ล้างข้อมูล</button>
   </div>
 </div>
 
@@ -516,7 +518,7 @@ function importOne(i){
 }
 
 function importAll(){
-  extractedRows.forEach((r,i)=>{
+  extractedRows.forEach((r,i)=>{ // eslint-disable-line
     // Read current values from table
     const rows = document.getElementById('extractedBody').querySelectorAll('tr');
     if(rows[i]){
@@ -535,6 +537,7 @@ function importAll(){
       amount: r.amount
     });
   });
+  autoSave();
   showTab('income');
 }
 
@@ -546,6 +549,7 @@ function addManualIncome(){
   incomeRows.push({id:nextId++, date, customer:name, desc:'', qty:1, unitPrice:amount, amount});
   document.getElementById('mName').value='';
   document.getElementById('mAmount').value='';
+  autoSave();
   showTab('income');
 }
 
@@ -587,7 +591,7 @@ function calcIncome(i){
 }
 
 function removeIncome(i){
-  incomeRows.splice(i,1); renderIncome();
+  incomeRows.splice(i,1); renderIncome(); autoSave();
 }
 
 // ============================================================
@@ -627,7 +631,7 @@ function renderExpTable(type, arr, bodyId){
 function removeExp(type,i){
   if(type==='goods') expGoods.splice(i,1);
   else expOther.splice(i,1);
-  renderExpense();
+  renderExpense(); autoSave();
 }
 
 // ============================================================
@@ -639,7 +643,7 @@ function addSlips(type, files){
     reader.onload = e=>{
       if(type==='in') slipsIn.push({src:e.target.result, label:'สลิปรับเงิน'});
       else slipsOut.push({src:e.target.result, label:'สลิปจ่ายเงิน'});
-      renderSlips();
+      renderSlips(); autoSave();
     };
     reader.readAsDataURL(f);
   });
@@ -1034,11 +1038,102 @@ function bahtText(amount){
   return cvt(b)+'บาท'+(s?cvt(s)+'สตางค์':'ถ้วน');
 }
 
+// ============================================================
+// SAVE / LOAD (localStorage + JSON export/import)
+// ============================================================
+function saveKey(){
+  const m = document.getElementById('selMonth').value;
+  const y = document.getElementById('selYear').value;
+  return `fujii_accounting_${y}_${m}`;
+}
+
+function autoSave(){
+  const data = {
+    incomeRows, expGoods, expOther,
+    slipsIn, slipsOut,
+    bookNo: document.getElementById('bookNo').value,
+    receiptNo: document.getElementById('receiptNo').value,
+    month: document.getElementById('selMonth').value,
+    year: document.getElementById('selYear').value
+  };
+  localStorage.setItem(saveKey(), JSON.stringify(data));
+  showSaveStatus();
+}
+
+function autoLoad(){
+  const raw = localStorage.getItem(saveKey());
+  if(!raw) return;
+  try {
+    const data = JSON.parse(raw);
+    incomeRows = data.incomeRows||[];
+    expGoods = data.expGoods||[];
+    expOther = data.expOther||[];
+    slipsIn = data.slipsIn||[];
+    slipsOut = data.slipsOut||[];
+    if(data.bookNo) document.getElementById('bookNo').value = data.bookNo;
+    if(data.receiptNo) document.getElementById('receiptNo').value = data.receiptNo;
+    nextId = Math.max(nextId, ...[...incomeRows,...expGoods,...expOther].map(r=>r.id+1), 1);
+  } catch(e){}
+}
+
+function showSaveStatus(){
+  let el = document.getElementById('saveStatus');
+  if(!el){
+    el = document.createElement('span');
+    el.id = 'saveStatus';
+    el.style = 'font-size:11px;color:#aaa;margin-left:8px';
+    document.querySelector('.month-select').appendChild(el);
+  }
+  const t = new Date();
+  el.textContent = `✓ บันทึกแล้ว ${t.getHours()}:${String(t.getMinutes()).padStart(2,'0')} น.`;
+}
+
+function exportData(){
+  const data = {
+    incomeRows, expGoods, expOther, slipsIn, slipsOut,
+    bookNo: document.getElementById('bookNo').value,
+    receiptNo: document.getElementById('receiptNo').value,
+    month: document.getElementById('selMonth').value,
+    year: document.getElementById('selYear').value
+  };
+  const m = ['','ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'][data.month];
+  const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `บัญชี_${m}_${data.year}.json`;
+  a.click();
+}
+
+function importData(input){
+  const file = input.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e=>{
+    try {
+      const data = JSON.parse(e.target.result);
+      incomeRows = data.incomeRows||[];
+      expGoods = data.expGoods||[];
+      expOther = data.expOther||[];
+      slipsIn = data.slipsIn||[];
+      slipsOut = data.slipsOut||[];
+      if(data.month) document.getElementById('selMonth').value = data.month;
+      if(data.year) document.getElementById('selYear').value = data.year;
+      if(data.bookNo) document.getElementById('bookNo').value = data.bookNo;
+      if(data.receiptNo) document.getElementById('receiptNo').value = data.receiptNo;
+      nextId = Math.max(nextId, ...[...incomeRows,...expGoods,...expOther].map(r=>r.id+1), 1);
+      renderIncome(); renderExpense(); renderSlips();
+      alert('โหลดข้อมูลสำเร็จ');
+    } catch(e){ alert('ไฟล์ไม่ถูกต้อง'); }
+  };
+  reader.readAsText(file);
+  input.value='';
+}
+
 function clearMonth(){
   if(!confirm('ล้างข้อมูลทั้งเดือน?')) return;
   incomeRows=[]; expGoods=[]; expOther=[]; slipsIn=[]; slipsOut=[]; extractedRows=[];
   document.getElementById('extractedCard').style.display='none';
   document.getElementById('parseStatus').textContent='';
+  localStorage.removeItem(saveKey());
   renderIncome(); renderExpense(); renderSlips();
 }
 
@@ -1052,6 +1147,16 @@ ua.addEventListener('drop',e=>{e.preventDefault();ua.style.borderColor='#aaa';if
 const now = new Date();
 document.getElementById('selMonth').value = now.getMonth()+1;
 document.getElementById('selYear').value = now.getFullYear()+543;
+
+// Auto-load on start
+autoLoad();
+
+// Auto-save on month change
+document.getElementById('selMonth').addEventListener('change', ()=>{ autoLoad(); renderIncome(); renderExpense(); renderSlips(); });
+document.getElementById('selYear').addEventListener('change', ()=>{ autoLoad(); renderIncome(); renderExpense(); renderSlips(); });
+
+// Auto-save every 30 seconds
+setInterval(autoSave, 30000);
 </script>
 </body>
 </html>
